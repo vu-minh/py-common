@@ -12,6 +12,10 @@ from dataset.dataset import load_dataset
 class DatasetTestCase(unittest.TestCase):
     def setUp(self):
         set_data_home('./data')
+        self.list_datasets = [
+            'FASHION100', 'QUICKDRAW200',
+            'IRIS', 'DIGITS', 'WINE', 'BREAST_CANCER'
+        ]
 
     def test_data_home(self):
         self.assertEqual(get_data_home(), './data')
@@ -22,6 +26,18 @@ class DatasetTestCase(unittest.TestCase):
     def test_dataset_name_does_not_exist(self):
         with self.assertRaises(ValueError):
             load_dataset('NameNotExist')
+
+    def test_load_dataset_return_3_array(self):
+        for dataset_name in self.list_datasets:
+            data = load_dataset(dataset_name)
+            self.assertEqual(len(data), 3)
+
+    def test_dataset_type(self):
+        for dataset_name in self.list_datasets:
+            data = load_dataset(dataset_name)
+            self.assertListEqual(
+                list(map(lambda X: X.dtype, data)), [np.float32]*3
+            )
 
     def test_dataset_size(self):
         expected_size = dict(
@@ -39,15 +55,6 @@ class DatasetTestCase(unittest.TestCase):
                 list(map(lambda X: X.shape, data)), dataset_size
             )
 
-    def test_dataset_type(self):
-        for dataset_name in [
-            'FASHION100', 'QUICKDRAW200',
-            'IRIS', 'DIGITS', 'WINE', 'BREAST_CANCER'
-        ]:
-            data = load_dataset(dataset_name)
-            self.assertListEqual(
-                list(map(lambda X: X.dtype, data)), [np.float32]*3
-            )
 
 # TODO TestCase class to test data preprocessing:
 # test_standardized_data (zero-mean, unit-variance)
