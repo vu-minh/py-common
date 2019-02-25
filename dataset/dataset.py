@@ -61,7 +61,7 @@ def get_data_loaders() -> Dict[str, Callable]:
     """
     return dict(
         [(f"FASHION{N}", fashion_loader(N))
-         for N in [100, 200, 500]] +
+         for N in [100, 200, 500, 1000, 1500, 2000, 2500, 5000, 10000]] +
         [(f"QUICKDRAW{N}", quickdraw_loader(N))
          for N in [50, 90, 100, 120, 200, 500, 1000]] +
         [("IRIS", sk_datasets.load_iris),
@@ -97,8 +97,9 @@ def load_dataset(name: str, preprocessing_method: str = 'standardize',
         standardize=StandardScaler,
         normalize=Normalizer,
         unitScale=MinMaxScaler,
-    ).get(preprocessing_method, Normalizer)
-    X_processed = preprocessor().fit_transform(X_original)
+    ).get(preprocessing_method, None)
+    X_processed = (X_original if preprocessor is None else
+                   preprocessor().fit_transform(X_original))
     return (X_original, X_processed, y)
 
 
