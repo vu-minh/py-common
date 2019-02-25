@@ -68,6 +68,7 @@ class SimpleFigure():
         if self.should_save:
             plt.tight_layout()
             plt.savefig(f'{outname}')
+            plt.close()
         else:
             plt.show()
         if self.should_track:
