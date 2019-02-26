@@ -46,12 +46,31 @@ def load_pickle(name: str) -> Dict:
     return data
 
 
+def load_coil20(N: int =1440, fixed_random_seed: int =1024) -> Dict:
+    import scipy.io
+    from sklearn.utils import shuffle
+
+    mat = scipy.io.loadmat(f"{data_config.DATA_HOME}/COIL20/COIL20.mat")
+    X, y = mat['X'], mat['Y'][:, 0]
+    X, y = shuffle(X, y, n_samples=N, random_state=fixed_random_seed)
+    labels = list(map(str, y.tolist()))
+    return {'data':X, 'target':y, 'target_names':labels}
+
+
+def coil20_loader(N: int) -> Callable:
+    return partial(load_coil20, N)
+
+
 def fashion_loader(N: int) -> Callable:
     return partial(load_pickle, f"{data_config.DATA_HOME}/fashion/{N}.pkl")
 
 
 def quickdraw_loader(N: int) -> Callable:
     return partial(load_pickle, f"{data_config.DATA_HOME}/quickdraw/{N}.pkl")
+
+
+def font_loader(ch: str, N: int) -> Callable:
+    return partial(load_pickle, f"{data_config.DATA_HOME}/Font/{ch}_{N}.pkl")
 
 
 def get_data_loaders() -> Dict[str, Callable]:
@@ -64,10 +83,15 @@ def get_data_loaders() -> Dict[str, Callable]:
          for N in [100, 200, 500, 1000, 1500, 2000, 2500, 5000, 10000]] +
         [(f"QUICKDRAW{N}", quickdraw_loader(N))
          for N in [50, 90, 100, 120, 200, 500, 1000]] +
+        [(f"FONT_{ch}_{N}", font_loader(ch, N))
+         for ch in ['A', 'M', 'E', 'Z'] for N in [100]] +
+        [(f"COIL20_{N}", coil20_loader(N))
+         for N in [100, 200, 500, 1000, 1440]] +
         [("IRIS", sk_datasets.load_iris),
          ("DIGITS", sk_datasets.load_digits),
          ("WINE", sk_datasets.load_wine),
-         ("BREAST_CANCER", sk_datasets.load_breast_cancer)]
+         ("BREAST_CANCER", sk_datasets.load_breast_cancer),
+         ("COIL20", coil20_loader(N=1440))]
     )
 
 
@@ -106,5 +130,5 @@ def load_dataset(name: str, preprocessing_method: str = 'standardize',
 if __name__ == '__main__':
     set_data_home('./data')
     print(get_data_home())
-    X_original, X, y = load_dataset('BREAST_CANCER')
+    X_original, X, y = load_dataset('COIL20_500')
     print(X_original.shape, X.shape, y.shape)

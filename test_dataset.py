@@ -13,8 +13,10 @@ class DatasetTestCase(unittest.TestCase):
     def setUp(self):
         set_data_home('./data')
         self.list_datasets = [
+            'FONT_A_100',
             'FASHION100', 'QUICKDRAW200',
-            'IRIS', 'DIGITS', 'WINE', 'BREAST_CANCER'
+            'IRIS', 'DIGITS', 'WINE', 'BREAST_CANCER',
+            'COIL20', 'COIL20_500'
         ]
 
     def test_data_home(self):
@@ -41,6 +43,9 @@ class DatasetTestCase(unittest.TestCase):
 
     def test_dataset_size(self):
         expected_size = dict(
+            COIL20=[(1440, 32*32), (1440, 32*32), (1440,)],
+            COIL20_500=[(500, 32*32), (500, 32*32), (500,)],
+            FONT_A_100=[(100, 24*24), (100, 24*24), (100,)],
             FASHION100=[(100, 28*28), (100, 28*28), (100,)],
             QUICKDRAW200=[(200, 28*28), (200, 28*28), (200,)],
             IRIS=[(150, 4), (150, 4), (150,)],
