@@ -57,6 +57,11 @@ def load_coil20(N: int =1440, fixed_random_seed: int =1024) -> Dict:
     return {'data':X, 'target':y, 'target_names':labels}
 
 
+def load_country(year: int) -> Dict:
+    pkl_obj = load_pickle(f"{data_config.DATA_HOME}/kaggle/country_indicators_{year}.pickle")
+    return pkl_obj['data'], pkl_obj['y'], pkl_obj['labels'] # X, y, labels
+
+
 def coil20_loader(N: int) -> Callable:
     return partial(load_coil20, N)
 
@@ -71,6 +76,10 @@ def quickdraw_loader(N: int) -> Callable:
 
 def font_loader(ch: str, N: int) -> Callable:
     return partial(load_pickle, f"{data_config.DATA_HOME}/Font/{ch}_{N}.pkl")
+
+
+def country_loader(year: int) -> Callable:
+    return partial(load_country, year)
 
 
 def get_data_loaders() -> Dict[str, Callable]:
@@ -130,5 +139,5 @@ def load_dataset(name: str, preprocessing_method: str = 'standardize',
 if __name__ == '__main__':
     set_data_home('./data')
     print(get_data_home())
-    X_original, X, y = load_dataset('COIL20_500')
+    X_original, X, y = load_country(2014)
     print(X_original.shape, X.shape, y.shape)
