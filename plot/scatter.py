@@ -17,7 +17,7 @@ seaborn.set(style='whitegrid')
 
 
 def imscatter(ax, X2d, data, zoom=1, inverse_cmap=True,
-              custom_cmap=None, labels_true=None):
+              custom_cmap=None, labels_true=None, frameon=False):
     img_size = int(math.sqrt(data.shape[1]))
     use_gray_cmap = (custom_cmap is None) or (labels_true is None)
 
@@ -30,8 +30,8 @@ def imscatter(ax, X2d, data, zoom=1, inverse_cmap=True,
             cmap = custom_cmap[label_i % 10]
 
         im = OffsetImage(data[i].reshape(img_size, img_size),
-                         zoom=zoom, cmap=cmap, alpha=0.9)
-        ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=False)
+                         zoom=zoom, cmap=cmap, alpha=1.0)
+        ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=frameon)
         # if wanna using frame color, set: bboxprops=dict(edgecolor='red')
         artists.append(ax.add_artist(ab))
     return artists
