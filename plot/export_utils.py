@@ -13,14 +13,14 @@ SVG_META_DATA = """<?xml version="1.0" encoding="utf-8" standalone="no"?>
     modified to stack multiple svg elemements,
     used for packing all images in a dataset
 -->
-<svg version="1.1" width="22" height="22" viewBox="0 0 22 22"
+<svg version="1.1" width="28" height="28" viewBox="0 0 28 28"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
 <style type="text/css">
     *{stroke-linecap:butt;stroke-linejoin:round;}
     .sprite { display: none;}
-    .sprite:target { display: inline; }
+    .sprite:target { display: block; margin-left: auto; margin-right: auto; }
     .packed-svg-custom {/*override this css to customize style for svg image*/}
 </style>
 </defs>
@@ -30,8 +30,8 @@ SVG_IMG_TAG = """
 <g class="sprite" id="{}">
     <image class="packed-svg-custom"
         id="stacked_svg_img_{}"
-        width="20"
-        height="20"
+        width="28"
+        height="28"
         xlink:href="data:image/png;base64,{}"
     />
 </g>
