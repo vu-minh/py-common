@@ -8,7 +8,7 @@ set_data_home('./data')
 output_svg_dir = './data/svg'
 list_dataset_names = [
     'DIGITS',
-    'FASHION100', 'FASHION200',
+    'FASHION100', 'FASHION200', 'FASHION500',
     'QUICKDRAW100', 'QUICKDRAW200',
     'COIL20_100', 'COIL20_200'
 ]
