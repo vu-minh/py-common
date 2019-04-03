@@ -14,17 +14,22 @@ class DRMetric(object):
     """ Metric measurements for DR methods
     """
 
-    def __init__(self, X, Y):
+    def __init__(self, X=None, Y=None):
         """ Create Metric object
         Args:
             X (ndarray): input data in high dimensional space
             Y (ndarray): embedded result in low dimensional space
         """
         super(DRMetric, self).__init__()
+        self.update(X, Y)
 
+    def update(self, X=None, Y=None):
         # pre-calculate pairwise distance in high-dim and low-dim
-        self.dX = pdist(X, "euclidean")
-        self.dY = pdist(Y, "euclidean")
+        if X is not None:
+            self.dX = pdist(X, "euclidean")
+        if Y is not None:
+            self.dY = pdist(Y, "euclidean")
+        return self
 
     def _qnx(self, a, b):
         """Vectorized version of `self._Qnx` for all values of `k`
@@ -42,8 +47,8 @@ class DRMetric(object):
     def auc_rnx(self):
         """Vectorized version of `self._auc_rnx`
         """
-        idX = np.argsort(squareform(self.dX**2), axis=1)
-        idY = np.argsort(squareform(self.dY**2), axis=1)
+        idX = np.argsort(squareform(self.dX ** 2), axis=1)
+        idY = np.argsort(squareform(self.dY ** 2), axis=1)
         n = len(idX)
 
         qnx = [self._qnx(a, b) for a, b in zip(idX, idY)]
@@ -79,7 +84,7 @@ class DRMetric(object):
         dY = scale(self.dY)
         diff = dX - dY
         weight = 1.0 - 1.0 / (1.0 + np.exp(-dY))
-        stress = np.dot(diff**2, weight)
+        stress = np.dot(diff ** 2, weight)
         return stress
 
     def mds_isotonic(self):
@@ -107,8 +112,7 @@ class DRMetric(object):
             $
         """
         dX = self.dX / np.std(self.dX)
-        dX_inv = np.divide(1.0, dX,
-                           out=np.zeros_like(dX), where=(dX != 0))
+        dX_inv = np.divide(1.0, dX, out=np.zeros_like(dX), where=(dX != 0))
         dY = self.dY / np.std(self.dY)
         diff = dX - dY
         stress = np.dot((diff ** 2), dX_inv)
@@ -126,9 +130,10 @@ class DRMetric(object):
 
         Vk = self.idX[:, :k]
         Nk = self.idY[:, :k]
-        q_nx = sum([np.intersect1d(a, b, assume_unique=True).size
-                    for a, b in zip(Vk, Nk)])
-        q_nx /= (k * self.n_samples)
+        q_nx = sum(
+            [np.intersect1d(a, b, assume_unique=True).size for a, b in zip(Vk, Nk)]
+        )
+        q_nx /= k * self.n_samples
 
         assert 0.0 <= q_nx <= 1.0
         return q_nx
@@ -143,7 +148,7 @@ class DRMetric(object):
         """
         assert 1 <= k <= self.n_samples - 2
         rnx = (self.n_samples - 1) * self._Qnx(k) - k
-        rnx /= (self.n_samples - 1 - k)
+        rnx /= self.n_samples - 1 - k
         return rnx
 
     def _auc_rnx(self):
