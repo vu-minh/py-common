@@ -12,26 +12,40 @@ from matplotlib.patches import Ellipse
 import seaborn
 
 
-plt.rcParams.update({'axes.titlesize': 'xx-large'})
-seaborn.set(style='whitegrid')
+plt.rcParams.update({"axes.titlesize": "xx-large"})
+seaborn.set(style="whitegrid")
 
 
-def imscatter(ax, X2d, data, zoom=1, inverse_cmap=True,
-              custom_cmap=None, labels_true=None, frameon=False):
+def imscatter(
+    ax,
+    X2d,
+    data,
+    zoom=1.0,
+    inverse_cmap=True,
+    custom_cmap=None,
+    labels_true=None,
+    frameon=False,
+):
     img_size = int(math.sqrt(data.shape[1]))
     use_gray_cmap = (custom_cmap is None) or (labels_true is None)
+
+    if img_size < 16:
+        zoom *= 2
+    elif img_size > 64:
+        zoom *= 0.5
 
     artists = []
     for i, [x0, y0] in enumerate(X2d):
         if use_gray_cmap:
-            cmap = 'gray_r' if inverse_cmap else 'gray'
+            cmap = "gray_r" if inverse_cmap else "gray"
         else:
             label_i = labels_true[i]
             cmap = custom_cmap[label_i % 10]
 
-        im = OffsetImage(data[i].reshape(img_size, img_size),
-                         zoom=zoom, cmap=cmap, alpha=1.0)
-        ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=frameon)
+        im = OffsetImage(
+            data[i].reshape(img_size, img_size), zoom=zoom, cmap=cmap, alpha=1.0
+        )
+        ab = AnnotationBbox(im, (x0, y0), xycoords="data", frameon=frameon)
         # if wanna using frame color, set: bboxprops=dict(edgecolor='red')
         artists.append(ax.add_artist(ab))
     return artists
