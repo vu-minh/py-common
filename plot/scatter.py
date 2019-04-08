@@ -12,8 +12,46 @@ from matplotlib.patches import Ellipse
 import seaborn
 
 
-plt.rcParams.update({"axes.titlesize": "xx-large"})
-seaborn.set(style="whitegrid")
+# plt.rcParams.update({"axes.titlesize": "xx-large"})
+# seaborn.set(style="whitegrid")
+
+
+def config_font_size(min_size=12):
+    """https://stackoverflow.com/a/39566040/5088950
+    """
+    SMALL_SIZE = min_size
+    MEDIUM_SIZE = min_size + 4
+    BIGGER_SIZE = min_size + 4 + 6
+
+    plt.rc("font", size=MEDIUM_SIZE)  # controls default text sizes
+    plt.rc("axes", titlesize=MEDIUM_SIZE)  # fontsize of the axes title
+    plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+    plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+    plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+    plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
+    plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+
+def scatter_with_box(ax, all_pos, marker="s", color="blue"):
+    """Scatter only with non-filled marker
+    """
+    ax.scatter(
+        all_pos[:, 0],
+        all_pos[:, 1],
+        marker=marker,
+        s=256,
+        facecolor="none",
+        edgecolor=color,
+        linewidth=2.0,
+    )
+
+
+def annotate_text(ax, text, pos, text_color="blue", offset=(-10, 10)):
+    """Set annotation text for only one point at fixed position
+    """
+    ax.annotate(
+        s=str(text), xy=pos, xytext=offset, textcoords="offset points", color=text_color
+    )
 
 
 def imscatter(
