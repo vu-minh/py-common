@@ -7,10 +7,12 @@ from plot.export_utils import generate_stacked_svg
 set_data_home('./data')
 output_svg_dir = './data/svg'
 list_dataset_names = [
-    'DIGITS',
-    'FASHION100', 'FASHION200', 'FASHION500',
-    'QUICKDRAW100', 'QUICKDRAW200',
-    'COIL20_100', 'COIL20_200'
+    # 'DIGITS',
+    # 'FASHION100', 'FASHION200', 'FASHION500',
+    # 'QUICKDRAW100', 'QUICKDRAW200',
+    'QUICKDRAW500'
+    # 'COIL20_100', 'COIL20_200'
+    # 'COIL20'
 ]
 
 for dataset_name in list_dataset_names:
