@@ -174,5 +174,5 @@ if __name__ == "__main__":
     print(get_data_home())
     # X_original, X, y = load_country(2014)
     # print(X_original.shape, X.shape, y.shape)
-    _, X, y = load_dataset("MPI")
+    _, X, y = load_dataset("COUNTRY2014")
     print(X.shape)
