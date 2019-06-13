@@ -60,3 +60,37 @@ def gen_dissimilar_links(labels, n_links, include_link_type=True):
         n_gen += 1
 
     return np.array(links)
+
+
+def generate_contrastive_constraints(labels, n_links=10):
+    """The contrastive constraints, in a narrow meaning, can be considered as a triplet(x, x+, x-),
+        in which, x is a sample, x+ is a positive sample (similar to x)
+        and x- is a negative sample (dissimilar to x)
+        
+        Can be used to construct a constraint-preserving score as follow:
+            - log ( exp(f(x)T f(x+)) / (exp(f(x)Tf(x+)) + exp(f(x)Tf(x-)))  )
+      
+        [1] S. Arora, H. Khandeparkar, M. Khodak, O. Plevrakis, and N. Saunshi, “A Theoretical Analysis of Contrastive Unsupervised Representation Learning,” 2019.
+    """
+    min_class_id, max_class_id = labels.min(), labels.max()
+    n_gen = 0
+    links = []
+    while n_gen < n_links:
+        # pick 2 random different classes
+        # not to use random.sample(items, k) to ensure random WITHOUT replacement
+        c1, c2 = random.sample(range(int(min_class_id), int(max_class_id) + 1), 2)
+
+        # filter point indices for each selected class
+        (idx1,) = np.where(labels == c1)
+        (idx2,) = np.where(labels == c2)
+
+        # random sample 2 points in the same class
+        px, px_positive = random.sample(idx1.tolist(), k=2)
+
+        # random the third negative sample from the other class
+        px_negative = random.choices(idx2.tolist())[0]
+
+        links.append([px, px_positive, px_negative])
+
+    return links
+    
