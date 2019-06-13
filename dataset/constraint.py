@@ -91,6 +91,7 @@ def generate_contrastive_constraints(labels, n_links=10):
         px_negative = random.choices(idx2.tolist())[0]
 
         links.append([px, px_positive, px_negative])
+        n_gen += 1
 
     return links
     
