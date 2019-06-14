@@ -1,5 +1,5 @@
-import os
-import joblib
+# import os
+# import joblib
 import random
 import numpy as np
 
@@ -8,7 +8,7 @@ SIM_LINK_TYPE = 1
 DIS_LINK_TYPE = -1
 
 
-def gen_similar_links(labels, n_links, include_link_type=True):
+def gen_similar_links(labels, n_links, include_link_type=True, seed=42):
     """Generate similar link (Must-link) constraints.
     """
     # Reference: https://realpython.com/python-random/
@@ -16,6 +16,8 @@ def gen_similar_links(labels, n_links, include_link_type=True):
     min_class_id, max_class_id = labels.min(), labels.max()
     n_gen = 0
     links = []
+
+    random.seed(seed)
     while n_gen < n_links:
         # pick random a class
         # random.randint(x, y) -> its range is [x, y]
@@ -37,12 +39,14 @@ def gen_similar_links(labels, n_links, include_link_type=True):
     return np.array(links)
 
 
-def gen_dissimilar_links(labels, n_links, include_link_type=True):
+def gen_dissimilar_links(labels, n_links, include_link_type=True, seed=42):
     """Generate dissimilar link (cannot-link) constraints.
     """
     min_class_id, max_class_id = labels.min(), labels.max()
     n_gen = 0
     links = []
+
+    random.seed(seed)
     while n_gen < n_links:
         # pick 2 random different classes
         # not to use random.sample(items, k) to ensure random WITHOUT replacement
@@ -62,19 +66,22 @@ def gen_dissimilar_links(labels, n_links, include_link_type=True):
     return np.array(links)
 
 
-def generate_contrastive_constraints(labels, n_links=10):
+def generate_contrastive_constraints(labels, n_links=10, seed=42):
     """The contrastive constraints, in a narrow meaning, can be considered as a triplet(x, x+, x-),
         in which, x is a sample, x+ is a positive sample (similar to x)
         and x- is a negative sample (dissimilar to x)
-        
+
         Can be used to construct a constraint-preserving score as follow:
             - log ( exp(f(x)T f(x+)) / (exp(f(x)Tf(x+)) + exp(f(x)Tf(x-)))  )
-      
-        [1] S. Arora, H. Khandeparkar, M. Khodak, O. Plevrakis, and N. Saunshi, “A Theoretical Analysis of Contrastive Unsupervised Representation Learning,” 2019.
+
+        [1] S. Arora, H. Khandeparkar, M. Khodak, O. Plevrakis, and N. Saunshi,
+        “A Theoretical Analysis of Contrastive Unsupervised Representation Learning,” 2019.
     """
     min_class_id, max_class_id = labels.min(), labels.max()
     n_gen = 0
     links = []
+
+    random.seed(seed)
     while n_gen < n_links:
         # pick 2 random different classes
         # not to use random.sample(items, k) to ensure random WITHOUT replacement
@@ -94,4 +101,3 @@ def generate_contrastive_constraints(labels, n_links=10):
         n_gen += 1
 
     return links
-    
