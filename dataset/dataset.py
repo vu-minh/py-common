@@ -141,7 +141,7 @@ def load_dataset(
 
     Args:
         name: code name of the dataset.
-        preprocessing_method: in `['standardize', 'normalize', 'unitScale']`
+        preprocessing_method: in `[None, 'standardize', 'normalize', 'unitScale']`
 
     Return:
         Tuple of np array: X_original, X_processed, y
