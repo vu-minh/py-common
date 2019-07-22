@@ -5,6 +5,7 @@ import os
 from collections import namedtuple
 from functools import partial
 import pickle
+import joblib
 
 import numpy as np  # type: ignore
 from sklearn.preprocessing import StandardScaler  # type: ignore
@@ -167,6 +168,13 @@ def load_dataset(
         X_original if preprocessor is None else preprocessor().fit_transform(X_original)
     )
     return (X_original, X_processed, y)
+
+
+def load_dataset_multi_label(dataset_name):
+    # dataset_name = "Automobile_transformed"
+    in_name = f"./data/kaggle/{dataset_name}.pkl"
+    data = joblib.load(in_name)
+    return (data["data"], data["multi_aspects"])
 
 
 if __name__ == "__main__":

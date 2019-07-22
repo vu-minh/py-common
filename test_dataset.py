@@ -4,6 +4,7 @@
 import unittest
 import numpy as np
 
+
 from dataset.dataset import set_data_home, get_data_home
 from dataset.dataset import list_datasets
 from dataset.dataset import load_dataset
@@ -67,5 +68,17 @@ class DatasetTestCase(unittest.TestCase):
 # test_unit_scaled_data (min=0, max=1)
 
 
+def test_load_multi_label_dataset():
+    import joblib
+    dataset_name = "Automobile_transformed"
+    in_name = f"./data/kaggle/{dataset_name}.pkl"
+    data = joblib.load(in_name)
+    print(data["multi_aspects"].keys())
+    print(data.keys())
+
+
+
 if __name__ == "__main__":
-    unittest.main()
+    # unittest.main()
+
+    test_load_multi_label_dataset()
