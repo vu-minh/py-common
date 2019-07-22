@@ -1,6 +1,5 @@
-# import os
-# import joblib
 import random
+import itertools
 import numpy as np
 
 
@@ -101,3 +100,41 @@ def generate_contrastive_constraints(labels, n_links=10, seed=42):
         n_gen += 1
 
     return links
+
+
+def pick_random_labels(labels, n_labels_each_class, seed=None):
+    """Randomly pick `n_labels_each_class` from the `labels` of all classes.
+    Returns:
+        dict of {class_id : [list of picked indices]}
+    """
+    result = {}
+    random.seed(seed)
+    for class_id in np.unique(labels):
+        (indices_of_this_class,) = np.where(labels == class_id)
+        result[class_id] = random.sample(indices_of_this_class.tolist(),
+                                         k=n_labels_each_class)
+    return result
+
+
+def generate_all_sim_links_from_partial_labels(partial_labels):
+    sim_links = []
+    for selecte_indices_in_same_class in partial_labels.values():
+        sim_links += itertools.combinations(selecte_indices_in_same_class, r=2)
+    return sim_links
+
+
+def generate_all_dis_links_from_partial_labels(partial_labels):
+    dis_links = []
+    all_class_indices = list(partial_labels.keys())
+    # choose two different classes
+    for class1, class2 in itertools.combinations(all_class_indices, r=2):
+        # generate all possible pair between indices these two classes
+        dis_links += itertools.product(partial_labels[class1], partial_labels[class2])
+    return dis_links
+
+
+def generate_constraints_from_partial_labels(labels, n_labels_each_class, seed=None):
+    partial_labels = pick_random_labels(labels, n_labels_each_class, seed=seed)
+    sim_links = generate_all_sim_links_from_partial_labels(partial_labels)
+    dis_links = generate_all_dis_links_from_partial_labels(partial_labels)
+    return sim_links, dis_links
