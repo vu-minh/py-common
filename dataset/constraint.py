@@ -117,20 +117,20 @@ def pick_random_labels(labels, n_labels_each_class, seed=None):
 
 
 def generate_all_sim_links_from_partial_labels(partial_labels):
-    sim_links = []
+    sim_links = []  # list of tuple (id1, id2)
     for selecte_indices_in_same_class in partial_labels.values():
         sim_links += itertools.combinations(selecte_indices_in_same_class, r=2)
-    return sim_links
+    return np.array(list(map(list, sim_links)))
 
 
 def generate_all_dis_links_from_partial_labels(partial_labels):
-    dis_links = []
+    dis_links = []  # list of tuple (id1, id2)
     all_class_indices = list(partial_labels.keys())
     # choose two different classes
     for class1, class2 in itertools.combinations(all_class_indices, r=2):
         # generate all possible pair between indices these two classes
         dis_links += itertools.product(partial_labels[class1], partial_labels[class2])
-    return dis_links
+    return np.array(list(map(list, dis_links)))
 
 
 def generate_constraints_from_partial_labels(labels, n_labels_each_class, seed=None):
