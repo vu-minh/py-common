@@ -11,6 +11,7 @@ import numpy as np  # type: ignore
 from sklearn.preprocessing import StandardScaler  # type: ignore
 from sklearn.preprocessing import Normalizer, MinMaxScaler  # type: ignore
 import sklearn.datasets as sk_datasets  # type: ignore
+from sklearn.datasets import fetch_mldata
 
 from typing import List, Dict, Tuple
 from typing import Callable
@@ -131,6 +132,7 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("MPI", old_pickle_loader("MPI_national")),
             ("DIABETES", old_pickle_loader("diabetes")),
             ("COUNTRY2014", country_loader(2014)),
+            ("MNIST", lambda: fetch_mldata('MNIST original', data_home=get_data_home()))
         ]
     )
 
