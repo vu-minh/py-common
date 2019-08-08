@@ -102,17 +102,29 @@ def generate_contrastive_constraints(labels, n_links=10, seed=42):
     return links
 
 
-def pick_random_labels(labels, n_labels_each_class, seed=None):
+def pick_random_labels(labels, n_labels_each_class: int, seed=None):
     """Randomly pick `n_labels_each_class` from the `labels` of all classes.
+    Try to pick different set for different param `n_labels_each_class`, i.e.,
+        + n_labels_each_class=3, pick (i1, i2, i3)
+        + n_labels_each_class=4, NOT pick (i1, i2, i3, i4),
+                                 BUT pick (a1, a2, a3, a4)
+    Note: if seed is None, it's ok
+          else, set seed manually as int(seed) + n_labels_each_class
     Returns:
         dict of {class_id : [list of picked indices]}
     """
     result = {}
-    random.seed(seed)
     for class_id in np.unique(labels):
+        # try to pick different set of `n_labels_each_class`
+        if seed is None:
+            random.seed(seed)
+        else:
+            random.seed(int(seed) + n_labels_each_class)
+
         (indices_of_this_class,) = np.where(labels == class_id)
         result[class_id] = random.sample(indices_of_this_class.tolist(),
                                          k=n_labels_each_class)
+        print(f"class id {int(class_id)}, random labels: {result[class_id]}")
     return result
 
 
