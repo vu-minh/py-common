@@ -7,6 +7,7 @@ from scipy.stats import pearsonr
 from sklearn.preprocessing import scale
 from sklearn.isotonic import IsotonicRegression
 
+
 MACHINE_EPSILON = np.finfo(np.double).eps
 
 
@@ -24,7 +25,7 @@ class DRMetric(object):
         self.update(X, Y)
 
     def update(self, X=None, Y=None):
-        # pre-calculate pairwise distance in high-dim and low-dim
+        """Pre-calculate pairwise distance in high-dim and low-dim"""
         if X is not None:
             self.dX = pdist(X, "euclidean")
         if Y is not None:
@@ -40,7 +41,7 @@ class DRMetric(object):
         for k in range(1, n - 1):
             common |= {a[k], b[k]}
             q = (2 * k - len(common)) / (k * n)
-            assert 0 <= 1 <= 1
+            assert 0 <= q <= 1
             res.append(q)
         return res
 
