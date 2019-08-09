@@ -8,12 +8,17 @@ from sklearn.preprocessing import scale
 from sklearn.isotonic import IsotonicRegression
 
 
-MACHINE_EPSILON = np.finfo(np.double).eps
-
-
 class DRMetric(object):
     """ Metric measurements for DR methods
     """
+
+    metrics_names = {
+        'auc_rnx': "$AUC_{log}RNX",
+        'pearsonr': "CC",
+        'cca_stress': "CCA",
+        'mds_isotonic': "NMS",
+        'sammon_nlm': "NLM"
+    }
 
     def __init__(self, X=None, Y=None):
         """ Create Metric object
