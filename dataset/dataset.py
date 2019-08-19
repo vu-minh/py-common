@@ -103,6 +103,11 @@ def old_pickle_loader(name: str) -> Callable:
     return partial(load_old_pickle, name)
 
 
+def load_20newsgroups(n_samples: int=2000, n_components: int=20):
+    file_name = f"{data_config.DATA_HOME}/20news/20NEWS{n_samples}_{n_components}.z"
+    return joblib.load(file_name)
+
+
 def get_data_loaders() -> Dict[str, Callable]:
     """Build a mapping from dataset name to the function for loading data.
     Since the function makes use of the path to the data file,
@@ -132,7 +137,8 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("MPI", old_pickle_loader("MPI_national")),
             ("DIABETES", old_pickle_loader("diabetes")),
             ("COUNTRY2014", country_loader(2014)),
-            ("MNIST", lambda: fetch_mldata('MNIST original', data_home=get_data_home()))
+            ("MNIST", lambda: fetch_mldata('MNIST original', data_home=get_data_home())),
+            ("20NEWS", load_20newsgroups),
         ]
     )
 
@@ -184,5 +190,5 @@ if __name__ == "__main__":
     print(get_data_home())
     # X_original, X, y = load_country(2014)
     # print(X_original.shape, X.shape, y.shape)
-    _, X, y = load_dataset("COUNTRY2014")
-    print(X.shape)
+    _, X, y = load_dataset("20NEWS", preprocessing_method=None)
+    print(X.shape, X.min(), X.max())

@@ -13,7 +13,7 @@ class DRMetric(object):
     """
 
     metrics_names = {
-        'auc_rnx': "$AUC_{log}RNX",
+        'auc_rnx': "$AUC_{log}RNX$",
         'pearsonr': "CC",
         'cca_stress': "CCA",
         'mds_isotonic': "NMS",
