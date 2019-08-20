@@ -147,7 +147,9 @@ def get_data_loaders() -> Dict[str, Callable]:
         ]
         + [
             ("PBMC5", partial(load_scRNA_data, "5k_pbmc_protein_v3_5classes")),
-            ("PBMC10", partial(load_scRNA_data, "5k_pbmc_protein_v3_10classes"))
+            ("PBMC10", partial(load_scRNA_data, "5k_pbmc_protein_v3_10classes")),
+            ("PBMC5_1K", partial(load_scRNA_data, "1k_pbmc_protein_v3_5classes")),
+            ("PBMC5_2K", partial(load_scRNA_data, "2k_pbmc_protein_v3_5classes")),
         ]
     )
 
@@ -199,5 +201,5 @@ if __name__ == "__main__":
     print(get_data_home())
     # X_original, X, y = load_country(2014)
     # print(X_original.shape, X.shape, y.shape)
-    _, X, y = load_dataset("PBMC5", preprocessing_method="standardize")
+    _, X, y = load_dataset("PBMC5_2K", preprocessing_method="standardize")
     print(X.shape, X.min(), X.max())
