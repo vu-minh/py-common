@@ -108,6 +108,11 @@ def load_20newsgroups(n_samples: int=2000, n_components: int=20):
     return joblib.load(file_name)
 
 
+def load_scRNA_data(name):
+    file_name = f"{data_config.DATA_HOME}/scRNA/{name}.z"
+    return joblib.load(file_name)
+
+
 def get_data_loaders() -> Dict[str, Callable]:
     """Build a mapping from dataset name to the function for loading data.
     Since the function makes use of the path to the data file,
@@ -139,6 +144,10 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("COUNTRY2014", country_loader(2014)),
             ("MNIST", lambda: fetch_mldata('MNIST original', data_home=get_data_home())),
             ("20NEWS", load_20newsgroups),
+        ]
+        + [
+            ("PBMC5", partial(load_scRNA_data, "5k_pbmc_protein_v3_5classes")),
+            ("PBMC10", partial(load_scRNA_data, "5k_pbmc_protein_v3_10classes"))
         ]
     )
 
@@ -190,5 +199,5 @@ if __name__ == "__main__":
     print(get_data_home())
     # X_original, X, y = load_country(2014)
     # print(X_original.shape, X.shape, y.shape)
-    _, X, y = load_dataset("20NEWS", preprocessing_method=None)
+    _, X, y = load_dataset("PBMC5", preprocessing_method="standardize")
     print(X.shape, X.min(), X.max())
