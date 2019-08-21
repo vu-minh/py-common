@@ -122,8 +122,10 @@ def pick_random_labels(labels, n_labels_each_class: int, seed=None):
             random.seed(int(seed) + n_labels_each_class)
 
         (indices_of_this_class,) = np.where(labels == class_id)
+        k_can_pick = min(n_labels_each_class, len(indices_of_this_class))
         result[class_id] = random.sample(indices_of_this_class.tolist(),
-                                         k=n_labels_each_class)
+                                         k=k_can_pick)
+
         # print(f"class id {int(class_id)}, random labels: {result[class_id]}")
     return result
 
