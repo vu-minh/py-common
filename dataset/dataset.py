@@ -148,6 +148,7 @@ def get_data_loaders() -> Dict[str, Callable]:
         + [
             ("PBMC_2K", partial(load_scRNA_data, "2k_pbmc_protein_3classes")),
             ("PBMC_5K", partial(load_scRNA_data, "5k_pbmc_protein_11classes")),
+            ("NEURON_1K", partial(load_scRNA_data, "neuron_1k_6classes")),
             ("QPCR", partial(load_scRNA_data, "guo_qpcr")),
         ]
     )
@@ -200,6 +201,6 @@ if __name__ == "__main__":
     print(get_data_home())
     # X_original, X, y = load_country(2014)
     # print(X_original.shape, X.shape, y.shape)
-    _, X, y = load_dataset("QPRC", preprocessing_method=None)
+    _, X, y = load_dataset("NEURON_1K", preprocessing_method=None)
     print(X.shape, X.min(), X.max())
     print(len(np.unique(y)))
