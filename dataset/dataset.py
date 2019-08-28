@@ -188,7 +188,7 @@ def load_dataset(
             "PBMC_5K": None,
             "FASHION_MOBILENET": None,
         }.get(
-            dataset_name, "unitScale"
+            name, "unitScale"
         )  # default for image dataset
 
     print("Preprocessing method: ", preprocessing_method)
