@@ -154,7 +154,7 @@ def get_data_loaders() -> Dict[str, Callable]:
 
 
 def load_dataset(
-    name: str, preprocessing_method: str = "standardize", dtype: object = np.float32
+    name: str, preprocessing_method: str = "auto", dtype: object = np.float32
 ) -> Tuple:
     """Load dataset from `config_data.DATA_HOME` folder
 
@@ -177,9 +177,25 @@ def load_dataset(
     X_original = data["data"].astype(dtype)
     y = data["target"].astype(dtype)
 
+    if preprocessing_method == "auto":
+        preprocessing_method = {
+            "COIL20": None,
+            "QPCR": None,
+            "NEURON_1K": None,
+            "HEART_1K": None,
+            "PBMC_1K": None,
+            "PBMC_2K": None,
+            "PBMC_5K": None,
+            "FASHION_MOBILENET": None,
+        }.get(
+            dataset_name, "unitScale"
+        )  # default for image dataset
+
+    print("Preprocessing method: ", preprocessing_method)
     preprocessor = dict(
         standardize=StandardScaler, normalize=Normalizer, unitScale=MinMaxScaler
     ).get(preprocessing_method, None)
+
     X_processed = (
         X_original if preprocessor is None else preprocessor().fit_transform(X_original)
     )
@@ -212,7 +228,7 @@ if __name__ == "__main__":
     # X_original, X, y = load_country(2014)
     # print(X_original.shape, X.shape, y.shape)
 
-    _, X, y = load_dataset(dataset_name, preprocessing_method=None)
+    _, X, y = load_dataset(dataset_name)
     print(X.shape, X.min(), X.max())
     print(len(np.unique(y)))
 
