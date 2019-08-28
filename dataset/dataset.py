@@ -103,20 +103,31 @@ def load_scRNA_data(name):
     return joblib.load(file_name)
 
 
+def load_pretrained_data(name):
+    data = joblib.load(f"{data_config.DATA_HOME}/pretrained/{name}.z")
+    return {"data": data["data_reduced"], "target": data["target"]}
+
+
 def get_data_loaders() -> Dict[str, Callable]:
     """Build a mapping from dataset name to the function for loading data.
     Since the function makes use of the path to the data file,
     they must be built on the fly to take the newest values of DATA_HOME
     """
     return dict(
-        [
+        [  # subset of Fashion-MNIST/zalando research
             (f"FASHION{N}", fashion_loader(N))
             for N in [100, 200, 500, 1000, 1500, 2000, 2500, 5000, 10000]
         ]
-        + [(f"QUICKDRAW{N}", quickdraw_loader(N)) for N in [50, 90, 100, 120, 200, 500, 1000]]
-        + [(f"FONT_{ch}_{N}", font_loader(ch, N)) for ch in ["A", "M", "E", "Z"] for N in [100]]
-        + [(f"COIL20_{N}", coil20_loader(N)) for N in [100, 200, 500, 1000, 1440]]
-        + [
+        + [  # google quickdraw
+            (f"QUICKDRAW{N}", quickdraw_loader(N)) for N in [50, 90, 100, 120, 200, 500, 1000]
+        ]
+        + [  # custom font dataset (build myself)
+            (f"FONT_{ch}_{N}", font_loader(ch, N)) for ch in ["A", "M", "E", "Z"] for N in [100]
+        ]
+        + [  # subset of COIL20
+            (f"COIL20_{N}", coil20_loader(N)) for N in [100, 200, 500, 1000, 1440]
+        ]
+        + [  # common dataset from sklearn
             ("IRIS", sk_datasets.load_iris),
             ("DIGITS", sk_datasets.load_digits),
             ("WINE", sk_datasets.load_wine),
@@ -128,13 +139,16 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("MNIST", lambda: fetch_mldata("MNIST original", data_home=get_data_home())),
             ("20NEWS", load_20newsgroups),
         ]
-        + [
+        + [  # genetic dataset from 10X Genomics
             ("PBMC_2K", partial(load_scRNA_data, "2k_pbmc_protein_3classes")),
             ("PBMC_5K", partial(load_scRNA_data, "5k_pbmc_protein_11classes")),
             ("PBMC_1K", partial(load_scRNA_data, "pbmc_1k_7classes")),
             ("NEURON_1K", partial(load_scRNA_data, "neuron_1k_6classes")),
             ("HEART_1K", partial(load_scRNA_data, "heart_1k_7classes")),
             ("QPCR", partial(load_scRNA_data, "guo_qpcr")),
+        ]
+        + [  # feature extraction from CNN
+            ("FASHION_MOBILENET", partial(load_pretrained_data, "FASHION_MOBILENET_128"))
         ]
     )
 
@@ -179,11 +193,32 @@ def load_dataset_multi_label(dataset_name):
     return (data["data"], data["multi_aspects"])
 
 
+def load_additional_labels(dataset_name, label_name=""):
+    in_name = {
+        "NEURON_1K": "scRNA/neuron_1k_multi_labels",
+        "FASHION_MOBILENET": "pretrained/FASHION_MOBILENET_128",
+    }[dataset_name]
+    data = joblib.load(f"{data_config.DATA_HOME}/{in_name}.z")
+    other_labels = data["all_targets"]
+    return other_labels.get(label_name, (None, f"{label_name} does not exist."))
+
+
 if __name__ == "__main__":
     set_data_home("./data")
     print(get_data_home())
+
+    dataset_name = "FASHION_MOBILENET"
+
     # X_original, X, y = load_country(2014)
     # print(X_original.shape, X.shape, y.shape)
-    _, X, y = load_dataset("PBMC_1K", preprocessing_method=None)
+
+    _, X, y = load_dataset(dataset_name, preprocessing_method=None)
     print(X.shape, X.min(), X.max())
     print(len(np.unique(y)))
+
+    labels2, des = load_additional_labels(dataset_name, label_name="class_subcat")
+    if labels2 is not None:
+        print(labels2.shape, des)
+        print(np.unique(labels2, return_counts=True))
+    else:
+        print(des)
