@@ -212,6 +212,7 @@ def load_dataset_multi_label(dataset_name):
 def load_additional_labels(dataset_name, label_name=""):
     in_name = {
         "NEURON_1K": "scRNA/neuron_1k_multi_labels",
+        "HEART_1K": "scRNA/heart_1k_multi_labels",
         "FASHION_MOBILENET": "pretrained/FASHION_MOBILENET_128",
     }[dataset_name]
     data = joblib.load(f"{data_config.DATA_HOME}/{in_name}.z")
@@ -223,7 +224,7 @@ if __name__ == "__main__":
     set_data_home("./data")
     print(get_data_home())
 
-    dataset_name = "FASHION_MOBILENET"
+    dataset_name = "HEART_1K"
 
     # X_original, X, y = load_country(2014)
     # print(X_original.shape, X.shape, y.shape)
@@ -232,7 +233,7 @@ if __name__ == "__main__":
     print(X.shape, X.min(), X.max())
     print(len(np.unique(y)))
 
-    labels2, des = load_additional_labels(dataset_name, label_name="class_subcat")
+    labels2, des = load_additional_labels(dataset_name, label_name="umi")
     if labels2 is not None:
         print(labels2.shape, des)
         print(np.unique(labels2, return_counts=True))
