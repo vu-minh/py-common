@@ -93,8 +93,11 @@ def old_pickle_loader(name: str) -> Callable:
     return partial(load_old_pickle, name)
 
 
-def load_20newsgroups(n_samples: int = 2000, n_components: int = 20):
-    file_name = f"{data_config.DATA_HOME}/20news/20NEWS{n_samples}_{n_components}.z"
+def load_20newsgroups(n_samples: int = 2000, n_components: int = 20, subset=None):
+    if subset is None:
+        file_name = f"{data_config.DATA_HOME}/20news/20NEWS{n_samples}_{n_components}.z"
+    else:
+        file_name = f"{data_config.DATA_HOME}/20news/20NEWS{subset}.z"
     return joblib.load(file_name)
 
 
@@ -137,7 +140,10 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("DIABETES", old_pickle_loader("diabetes")),
             ("COUNTRY2014", country_loader(2014)),
             ("MNIST", lambda: fetch_mldata("MNIST original", data_home=get_data_home())),
-            ("20NEWS", load_20newsgroups),
+        ]
+        + [  # 20 newsgroups and a subset of 5 groups
+            ("20NEWS", partial(load_20newsgroups, subset=None)),
+            ("20NEWS5", partial(load_20newsgroups, subset=5)),
         ]
         + [  # genetic dataset from 10X Genomics
             ("PBMC_2K", partial(load_scRNA_data, "2k_pbmc_protein_3classes")),
@@ -187,6 +193,7 @@ def load_dataset(
             "PBMC_2K": None,
             "PBMC_5K": None,
             "FASHION_MOBILENET": None,
+            "20NEWS5": None,
         }.get(
             name, "unitScale"
         )  # default for image dataset
@@ -213,8 +220,12 @@ def load_additional_labels(dataset_name, label_name=""):
     in_name = {
         "NEURON_1K": "scRNA/neuron_1k_multi_labels",
         "HEART_1K": "scRNA/heart_1k_multi_labels",
+        "PBMC_1K": "scRNA/pbmc_1k_multi_labels",
         "FASHION_MOBILENET": "pretrained/FASHION_MOBILENET_128",
-    }[dataset_name]
+        "20NEWS5": "20news/20NEWS5",
+    }.get(dataset_name, None)
+    if in_name is None:
+        return (None, None)
     data = joblib.load(f"{data_config.DATA_HOME}/{in_name}.z")
     other_labels = data["all_targets"]
     return other_labels.get(label_name, (None, f"{label_name} does not exist."))
@@ -224,18 +235,17 @@ if __name__ == "__main__":
     set_data_home("./data")
     print(get_data_home())
 
-    dataset_name = "HEART_1K"
-
-    # X_original, X, y = load_country(2014)
-    # print(X_original.shape, X.shape, y.shape)
+    dataset_name = "20NEWS5"
+    other_label_name = "cat"
 
     _, X, y = load_dataset(dataset_name)
-    print(X.shape, X.min(), X.max())
-    print(len(np.unique(y)))
+    print(dataset_name, X.shape, X.min(), X.max())
+    print("n classes: ", len(np.unique(y)))
 
-    labels2, des = load_additional_labels(dataset_name, label_name="umi")
-    if labels2 is not None:
-        print(labels2.shape, des)
-        print(np.unique(labels2, return_counts=True))
-    else:
-        print(des)
+    if other_label_name is not None:
+        labels2, des = load_additional_labels(dataset_name, label_name=other_label_name)
+        if labels2 is not None:
+            print(labels2.shape, des)
+            print(np.unique(labels2, return_counts=True))
+        else:
+            print("Can not find other label data: ", des)
