@@ -8,8 +8,10 @@ from matplotlib import cm
 from matplotlib import patches
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from matplotlib.patches import Ellipse
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import to_rgb
 
-import seaborn
+# import seaborn
 
 
 # plt.rcParams.update({"axes.titlesize": "xx-large"})
@@ -54,6 +56,19 @@ def annotate_text(ax, text, pos, text_color="blue", offset=(-10, 10)):
     )
 
 
+def get_custom_cmap():  
+    def create_cm(basecolor):
+        colors = [(1, 1, 1), to_rgb(basecolor), to_rgb(basecolor)]  # R -> G -> B
+        return LinearSegmentedColormap.from_list(colors=colors, name=basecolor)
+
+    basecolors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+                  "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+    cmaps = []
+    for basecolor in basecolors:
+        cmaps.append(create_cm(basecolor))
+    return cmaps
+
+    
 def imscatter(
     ax,
     X2d,
@@ -65,7 +80,7 @@ def imscatter(
     frameon=False,
 ):
     img_size = int(math.sqrt(data.shape[1]))
-    use_gray_cmap = (custom_cmap is None) or (labels_true is None)
+    use_gray_cmap = (not custom_cmap) or (labels_true is None)
 
     if img_size < 16:
         zoom *= 2
@@ -77,8 +92,8 @@ def imscatter(
         if use_gray_cmap:
             cmap = "gray_r" if inverse_cmap else "gray"
         else:
-            label_i = labels_true[i]
-            cmap = custom_cmap[label_i % 10]
+            label_i = int(labels_true[i])
+            cmap = get_custom_cmap()[label_i % 10]
 
         im = OffsetImage(
             data[i].reshape(img_size, img_size), zoom=zoom, cmap=cmap, alpha=1.0
