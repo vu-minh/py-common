@@ -140,6 +140,10 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("DIABETES", old_pickle_loader("diabetes")),
             ("COUNTRY2014", country_loader(2014)),
             ("MNIST", lambda: fetch_mldata("MNIST original", data_home=get_data_home())),
+            (
+                "OLIVETTI",
+                lambda: sk_datasets.fetch_olivetti_faces(data_home=f"{get_data_home()}/mldata"),
+            ),
         ]
         + [  # 20 newsgroups and a subset of 5 groups
             ("20NEWS", partial(load_20newsgroups, subset=None)),
@@ -194,6 +198,7 @@ def load_dataset(
             "PBMC_5K": None,
             "FASHION_MOBILENET": None,
             "20NEWS5": None,
+            "OLIVETTI": None,
         }.get(
             name, "unitScale"
         )  # default for image dataset
@@ -210,13 +215,25 @@ def load_dataset(
 
 
 def load_dataset_multi_label(dataset_name):
-    # dataset_name = "Automobile_transformed"
+    """[Deprecated] load multi labels dataset, e.g.
+
+    Args:
+        dataset_name: str, e.g. "Automobile_transformed"
+
+    Return:
+        Dict of 'data' and 'multi_aspects' labels
+    """
     in_name = f"./data/kaggle/{dataset_name}.pkl"
     data = joblib.load(in_name)
     return (data["data"], data["multi_aspects"])
 
 
 def load_additional_labels(dataset_name, label_name=""):
+    """Load additional labels for a datatset for a given `label_name`
+    Return:
+        Tuple of (labels, description text)
+        (None, error message) in case `label_name` not found.
+    """
     in_name = {
         "NEURON_1K": "scRNA/neuron_1k_multi_labels",
         "HEART_1K": "scRNA/heart_1k_multi_labels",
@@ -235,8 +252,8 @@ if __name__ == "__main__":
     set_data_home("./data")
     print(get_data_home())
 
-    dataset_name = "20NEWS5"
-    other_label_name = "cat"
+    dataset_name = "FASHION1000"  # "FASHION_MOBILENET"
+    other_label_name = None  # "class_subcat"
 
     _, X, y = load_dataset(dataset_name)
     print(dataset_name, X.shape, X.min(), X.max())
