@@ -252,8 +252,8 @@ if __name__ == "__main__":
     set_data_home("./data")
     print(get_data_home())
 
-    dataset_name = "FASHION1000"  # "FASHION_MOBILENET"
-    other_label_name = None  # "class_subcat"
+    dataset_name = "FASHION_MOBILENET"
+    other_label_name = "class_subcat"  # None
 
     _, X, y = load_dataset(dataset_name)
     print(dataset_name, X.shape, X.min(), X.max())
