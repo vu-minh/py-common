@@ -1,7 +1,9 @@
 # some metric measurement for DR methods
 
+# import jax.numpy as np
 import numpy as np
 from numpy.linalg import norm
+
 from scipy.spatial.distance import pdist, squareform
 from scipy.stats import pearsonr
 from sklearn.preprocessing import scale
@@ -13,11 +15,11 @@ class DRMetric(object):
     """
 
     metrics_names = {
-        'auc_rnx': "$AUC_{log}RNX$",
-        'pearsonr': "CC",
-        'cca_stress': "CCA",
-        'mds_isotonic': "NMS",
-        'sammon_nlm': "NLM"
+        "auc_rnx": "$AUC_{log}RNX$",
+        "pearsonr": "CC",
+        "cca_stress": "CCA",
+        "mds_isotonic": "NMS",
+        "sammon_nlm": "NLM",
     }
 
     def __init__(self, X=None, Y=None):
@@ -136,9 +138,7 @@ class DRMetric(object):
 
         Vk = self.idX[:, :k]
         Nk = self.idY[:, :k]
-        q_nx = sum(
-            [np.intersect1d(a, b, assume_unique=True).size for a, b in zip(Vk, Nk)]
-        )
+        q_nx = sum([np.intersect1d(a, b, assume_unique=True).size for a, b in zip(Vk, Nk)])
         q_nx /= k * self.n_samples
 
         assert 0.0 <= q_nx <= 1.0
