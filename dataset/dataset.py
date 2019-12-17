@@ -108,7 +108,7 @@ def load_scRNA_data(name):
 
 def load_pretrained_data(name):
     data = joblib.load(f"{data_config.DATA_HOME}/pretrained/{name}.z")
-    return {"data": data["data_reduced"], "target": data["target"]}
+    return {"data": data["data"], "target": data["target"]}
 
 
 def get_data_loaders() -> Dict[str, Callable]:
@@ -252,8 +252,8 @@ if __name__ == "__main__":
     set_data_home("./data")
     print(get_data_home())
 
-    dataset_name = "FASHION1000"  # "FASHION_MOBILENET"
-    other_label_name = None  # "class_subcat"
+    dataset_name = "FASHION_MOBILENET"  # "FASHION_MOBILENET"
+    other_label_name = "class_subcat"
 
     _, X, y = load_dataset(dataset_name)
     print(dataset_name, X.shape, X.min(), X.max())
