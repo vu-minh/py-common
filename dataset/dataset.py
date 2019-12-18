@@ -8,10 +8,13 @@ import pickle
 import joblib
 
 import numpy as np  # type: ignore
+from scipy import stats
 from sklearn.preprocessing import StandardScaler  # type: ignore
 from sklearn.preprocessing import Normalizer, MinMaxScaler  # type: ignore
+from sklearn.decomposition import PCA
 import sklearn.datasets as sk_datasets  # type: ignore
 from sklearn.datasets import fetch_mldata
+from sklearn.utils import shuffle
 
 from typing import List, Dict, Tuple
 from typing import Callable
@@ -50,11 +53,19 @@ def load_pickle(name: str) -> Dict:
 
 def load_coil20(N: int = 1440, fixed_random_seed: int = 1024) -> Dict:
     import scipy.io
-    from sklearn.utils import shuffle
 
     mat = scipy.io.loadmat(f"{data_config.DATA_HOME}/COIL20/COIL20.mat")
     X, y = mat["X"], mat["Y"][:, 0]
     X, y = shuffle(X, y, n_samples=N, random_state=fixed_random_seed)
+    labels = list(map(str, y.tolist()))
+    return {"data": X, "target": y, "target_names": labels}
+
+
+def load_mnist(N: int = 2000, fixed_random_seed: int = 1024) -> Dict:
+    data = fetch_mldata("MNIST original", data_home=get_data_home())
+    X, y = data["data"], data["target"]
+    if N is not None:
+        X, y = shuffle(X, y, n_samples=N, random_state=fixed_random_seed)
     labels = list(map(str, y.tolist()))
     return {"data": X, "target": y, "target_names": labels}
 
@@ -71,6 +82,10 @@ def load_old_pickle(name: str) -> Dict:
 
 def coil20_loader(N: int) -> Callable:
     return partial(load_coil20, N)
+
+
+def mnist_loader(N: int) -> Callable:
+    return partial(load_mnist, N)
 
 
 def fashion_loader(N: int) -> Callable:
@@ -130,6 +145,9 @@ def get_data_loaders() -> Dict[str, Callable]:
         + [  # subset of COIL20
             (f"COIL20_{N}", coil20_loader(N)) for N in [100, 200, 500, 1000, 1440]
         ]
+        + [  # subset of MNIST
+            (f"MNIST{N}", mnist_loader(int(N) if N else None)) for N in ["", 1000, 2000, 5000]
+        ]
         + [  # common dataset from sklearn
             ("IRIS", sk_datasets.load_iris),
             ("DIGITS", sk_datasets.load_digits),
@@ -139,7 +157,7 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("MPI", old_pickle_loader("MPI_national")),
             ("DIABETES", old_pickle_loader("diabetes")),
             ("COUNTRY2014", country_loader(2014)),
-            ("MNIST", lambda: fetch_mldata("MNIST original", data_home=get_data_home())),
+            # ("MNIST", lambda: fetch_mldata("MNIST original", data_home=get_data_home())),
             (
                 "OLIVETTI",
                 lambda: sk_datasets.fetch_olivetti_faces(data_home=f"{get_data_home()}/mldata"),
@@ -164,12 +182,16 @@ def get_data_loaders() -> Dict[str, Callable]:
 
 
 def load_dataset(
-    name: str, preprocessing_method: str = "auto", dtype: object = np.float32
+    name: str, preprocessing_method: str = "auto", pca: any = 0.9, dtype: object = np.float32
 ) -> Tuple:
     """Load dataset from `config_data.DATA_HOME` folder
 
     Args:
         name: code name of the dataset.
+        pca: float or int: run PCA for the dataset.
+            if pca is a float in [0, 1], it is the percentage of expected variance.
+            if pca is an int in [1, N], it is the number of dimentions to keep.
+            if pca is zero or None, PCA is not performed.
         preprocessing_method: in `[None, 'standardize', 'normalize', 'unitScale']`
 
     Return:
@@ -203,14 +225,22 @@ def load_dataset(
             name, "unitScale"
         )  # default for image dataset
 
-    print("Preprocessing method: ", preprocessing_method)
     preprocessor = dict(
         standardize=StandardScaler, normalize=Normalizer, unitScale=MinMaxScaler
     ).get(preprocessing_method, None)
 
-    X_processed = (
-        X_original if preprocessor is None else preprocessor().fit_transform(X_original)
+    print(f"[DEBUG] X{X_original.shape}, y{y.shape}, n_class:{len(np.unique(y))}")
+    X_processed = preprocessor().fit_transform(X_original) if preprocessor else X_original
+    print(
+        "[DEBUG] Preprocessing: ", preprocessing_method, stats.describe(X_processed, axis=None)
     )
+
+    # do not run PCA for 10X genetic and 20News dataset
+    if name.startswith(("QPCR", "NEURON", "HEART", "PBMC",) + ("20NEWS",)):
+        pca = None
+    X_processed = PCA(pca).fit_transform(X_processed) if pca else X_processed
+    print("[DEBUG] PCA: ", pca, X_processed.shape)
+
     return (X_original, X_processed, y)
 
 
@@ -254,10 +284,7 @@ if __name__ == "__main__":
 
     dataset_name = "FASHION_MOBILENET"
     other_label_name = "class_subcat"  # None
-
-    _, X, y = load_dataset(dataset_name)
-    print(dataset_name, X.shape, X.min(), X.max())
-    print("n classes: ", len(np.unique(y)))
+    _, X, y = load_dataset(dataset_name, pca=0.9)
 
     if other_label_name is not None:
         labels2, des = load_additional_labels(dataset_name, label_name=other_label_name)
