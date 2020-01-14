@@ -266,15 +266,21 @@ def load_additional_labels(dataset_name, label_name=""):
     """
     in_name = {
         "NEURON_1K": "scRNA/neuron_1k_multi_labels",
+        # ['graph_based_cluster', 'umi']
         "HEART_1K": "scRNA/heart_1k_multi_labels",
+        # ['graph_based_cluster', 'umi']
         "PBMC_1K": "scRNA/pbmc_1k_multi_labels",
+        # ['graph_based_cluster', 'umi']
         "FASHION_MOBILENET": "pretrained/FASHION_MOBILENET_128",
+        # ['class_gender', 'class_subcat', 'class_matcat']
         "20NEWS5": "20news/20NEWS5",
+        # ['cat', 'matcat']
     }.get(dataset_name, None)
     if in_name is None:
         return (None, None)
     data = joblib.load(f"{data_config.DATA_HOME}/{in_name}.z")
     other_labels = data["all_targets"]
+    print(list(other_labels.keys()))
     return other_labels.get(label_name, (None, f"{label_name} does not exist."))
 
 
