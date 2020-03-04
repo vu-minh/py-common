@@ -71,13 +71,23 @@ def load_mnist(N: int = 2000, fixed_random_seed: int = 1024) -> Dict:
 
 
 def load_country(year: int) -> Dict:
-    pkl_obj = load_pickle(f"{data_config.DATA_HOME}/kaggle/country_indicators_{year}.pickle")
-    return {"data": pkl_obj["data"], "target": pkl_obj["y"], "target_names": pkl_obj["labels"]}
+    pkl_obj = load_pickle(
+        f"{data_config.DATA_HOME}/kaggle/country_indicators_{year}.pickle"
+    )
+    return {
+        "data": pkl_obj["data"],
+        "target": pkl_obj["y"],
+        "target_names": pkl_obj["labels"],
+    }
 
 
 def load_old_pickle(name: str) -> Dict:
     pkl_obj = load_pickle(f"{data_config.DATA_HOME}/kaggle/{name}.pickle")
-    return {"data": pkl_obj["data"], "target": pkl_obj["y"], "target_names": pkl_obj["labels"]}
+    return {
+        "data": pkl_obj["data"],
+        "target": pkl_obj["y"],
+        "target_names": pkl_obj["labels"],
+    }
 
 
 def coil20_loader(N: int) -> Callable:
@@ -137,16 +147,20 @@ def get_data_loaders() -> Dict[str, Callable]:
             for N in [100, 200, 500, 1000, 1500, 2000, 2500, 5000, 10000]
         ]
         + [  # google quickdraw
-            (f"QUICKDRAW{N}", quickdraw_loader(N)) for N in [50, 90, 100, 120, 200, 500, 1000]
+            (f"QUICKDRAW{N}", quickdraw_loader(N))
+            for N in [50, 90, 100, 120, 200, 500, 1000]
         ]
         + [  # custom font dataset (build myself)
-            (f"FONT_{ch}_{N}", font_loader(ch, N)) for ch in ["A", "M", "E", "Z"] for N in [100]
+            (f"FONT_{ch}_{N}", font_loader(ch, N))
+            for ch in ["A", "M", "E", "Z"]
+            for N in [100]
         ]
         + [  # subset of COIL20
             (f"COIL20_{N}", coil20_loader(N)) for N in [100, 200, 500, 1000, 1440]
         ]
         + [  # subset of MNIST
-            (f"MNIST{N}", mnist_loader(int(N) if N else None)) for N in ["", 1000, 2000, 5000]
+            (f"MNIST{N}", mnist_loader(int(N) if N else None))
+            for N in ["", 1000, 2000, 5000]
         ]
         + [  # common dataset from sklearn
             ("IRIS", sk_datasets.load_iris),
@@ -160,7 +174,9 @@ def get_data_loaders() -> Dict[str, Callable]:
             # ("MNIST", lambda: fetch_mldata("MNIST original", data_home=get_data_home())),
             (
                 "OLIVETTI",
-                lambda: sk_datasets.fetch_olivetti_faces(data_home=f"{get_data_home()}/mldata"),
+                lambda: sk_datasets.fetch_olivetti_faces(
+                    data_home=f"{get_data_home()}/mldata"
+                ),
             ),
         ]
         + [  # 20 newsgroups and a subset of 5 groups
@@ -176,13 +192,19 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("QPCR", partial(load_scRNA_data, "guo_qpcr")),
         ]
         + [  # feature extraction from CNN
-            ("FASHION_MOBILENET", partial(load_pretrained_data, "FASHION_MOBILENET_128"))
+            (
+                "FASHION_MOBILENET",
+                partial(load_pretrained_data, "FASHION_MOBILENET_128"),
+            )
         ]
     )
 
 
 def load_dataset(
-    name: str, preprocessing_method: str = "auto", pca: any = 0.9, dtype: object = np.float32
+    name: str,
+    preprocessing_method: str = "auto",
+    pca: any = 0.9,
+    dtype: object = np.float32,
 ) -> Tuple:
     """Load dataset from `config_data.DATA_HOME` folder
 
@@ -202,7 +224,9 @@ def load_dataset(
     if load_func is None:
         raise ValueError(
             "{} dataset is not available."
-            "The available ones are:\n\t{}".format(name, "\n\t".join(data_loaders.keys()))
+            "The available ones are:\n\t{}".format(
+                name, "\n\t".join(data_loaders.keys())
+            )
         )
 
     data = load_func()
@@ -230,9 +254,13 @@ def load_dataset(
     ).get(preprocessing_method, None)
 
     print(f"[DEBUG] X{X_original.shape}, y{y.shape}, n_class:{len(np.unique(y))}")
-    X_processed = preprocessor().fit_transform(X_original) if preprocessor else X_original
+    X_processed = (
+        preprocessor().fit_transform(X_original) if preprocessor else X_original
+    )
     print(
-        "[DEBUG] Preprocessing: ", preprocessing_method, stats.describe(X_processed, axis=None)
+        "[DEBUG] Preprocessing: ",
+        preprocessing_method,
+        stats.describe(X_processed, axis=None),
     )
 
     # do not run PCA for 10X genetic and 20News dataset
@@ -282,6 +310,12 @@ def load_additional_labels(dataset_name, label_name=""):
     other_labels = data["all_targets"]
     print(list(other_labels.keys()))
     return other_labels.get(label_name, (None, f"{label_name} does not exist."))
+
+
+def is_image_dataset(dataset_name):
+    return dataset_name.startswith(
+        ("DIGITS", "MNIST", "FASHION", "COIL20", "QUICKDRAW", "FONT")
+    ) and not dataset_name.endswith(("MOBILENET"))
 
 
 if __name__ == "__main__":
