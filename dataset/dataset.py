@@ -13,7 +13,7 @@ from sklearn.preprocessing import StandardScaler  # type: ignore
 from sklearn.preprocessing import Normalizer, MinMaxScaler  # type: ignore
 from sklearn.decomposition import PCA
 import sklearn.datasets as sk_datasets  # type: ignore
-from sklearn.datasets import fetch_mldata
+from sklearn.datasets import fetch_openml
 from sklearn.utils import shuffle
 
 from typing import List, Dict, Tuple
@@ -62,7 +62,7 @@ def load_coil20(N: int = 1440, fixed_random_seed: int = 1024) -> Dict:
 
 
 def load_mnist(N: int = 2000, fixed_random_seed: int = 1024) -> Dict:
-    data = fetch_mldata("MNIST original", data_home=get_data_home())
+    data = fetch_openml("mnist_784", data_home=get_data_home())
     X, y = data["data"], data["target"]
     if N is not None:
         X, y = shuffle(X, y, n_samples=N, random_state=fixed_random_seed)
