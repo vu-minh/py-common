@@ -34,6 +34,53 @@ def config_font_size(min_size=12):
     plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
+def scatter3d(X, labels=None, title="", out_name="scatter3d.html"):
+    import plotly.graph_objects as go
+
+    fig = go.Figure(
+        data=[
+            go.Scatter3d(
+                x=X[:, 0],
+                y=X[:, 1],
+                z=X[:, 2],
+                mode="markers",
+                marker=dict(size=6, color=labels, colorscale="jet", opacity=0.6),
+            ),
+        ]
+    )
+    fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))
+    fig.write_html(out_name)
+
+
+def simple_scatter(
+    X,
+    labels=None,
+    title="",
+    out_name="simple_scatter.png",
+    aspect_equal=True,
+    show_legend=True,
+):
+    """2D scatter plot and save figure to `out_name`
+    """
+    n_classes = len(np.unique(labels))
+    cmap = "tab10_r" if n_classes <= 10 else "tab20a"
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+    if aspect_equal:
+        ax.set_aspect("equal")
+
+    ax.set_title(title)
+    scatter = ax.scatter(X[:, 0], X[:, 1], c=labels, alpha=0.6, cmap=cmap)
+
+    if show_legend:
+        legend1 = ax.legend(
+            *scatter.legend_elements(num=n_classes), loc="best", title="Class"
+        )
+        ax.add_artist(legend1)
+
+    fig.savefig(out_name, bbox_inches="tight")
+    plt.close(fig)
+
+
 def scatter_with_box(ax, all_pos, marker="s", color="blue"):
     """Scatter only with non-filled marker
     """
@@ -56,19 +103,29 @@ def annotate_text(ax, text, pos, text_color="blue", offset=(-10, 10)):
     )
 
 
-def get_custom_cmap():  
+def get_custom_cmap():
     def create_cm(basecolor):
         colors = [(1, 1, 1), to_rgb(basecolor), to_rgb(basecolor)]  # R -> G -> B
         return LinearSegmentedColormap.from_list(colors=colors, name=basecolor)
 
-    basecolors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
-                  "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+    basecolors = [
+        "#1f77b4",
+        "#ff7f0e",
+        "#2ca02c",
+        "#d62728",
+        "#9467bd",
+        "#8c564b",
+        "#e377c2",
+        "#7f7f7f",
+        "#bcbd22",
+        "#17becf",
+    ]
     cmaps = []
     for basecolor in basecolors:
         cmaps.append(create_cm(basecolor))
     return cmaps
 
-    
+
 def imscatter(
     ax,
     X2d,
