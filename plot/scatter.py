@@ -63,7 +63,7 @@ def simple_scatter(
     """2D scatter plot and save figure to `out_name`
     """
     n_classes = len(np.unique(labels))
-    cmap = "tab10_r" if n_classes <= 10 else "tab20a"
+    cmap = "tab10_r" if n_classes <= 10 else "tab20"
     fig, ax = plt.subplots(1, 1, figsize=(8, 8))
     if aspect_equal:
         ax.set_aspect("equal")
