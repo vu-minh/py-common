@@ -160,7 +160,7 @@ def get_data_loaders() -> Dict[str, Callable]:
         ]
         + [  # subset of MNIST
             (f"MNIST{N}", mnist_loader(int(N) if N else None))
-            for N in ["", 1000, 2000, 5000]
+            for N in ["", 1000, 2000, 5000, 10000]
         ]
         + [  # common dataset from sklearn
             ("IRIS", sk_datasets.load_iris),
@@ -189,6 +189,7 @@ def get_data_loaders() -> Dict[str, Callable]:
             ("PBMC_1K", partial(load_scRNA_data, "pbmc_1k_7classes")),
             ("NEURON_1K", partial(load_scRNA_data, "neuron_1k_6classes")),
             ("HEART_1K", partial(load_scRNA_data, "heart_1k_7classes")),
+            ("HEART_10K", partial(load_scRNA_data, "heart_10k_13classes")),
             ("QPCR", partial(load_scRNA_data, "guo_qpcr")),
         ]
         + [  # feature extraction from CNN
@@ -239,6 +240,7 @@ def load_dataset(
             "QPCR": None,
             "NEURON_1K": None,
             "HEART_1K": None,
+            "HEART_10K": None,
             "PBMC_1K": None,
             "PBMC_2K": None,
             "PBMC_5K": None,
@@ -323,7 +325,7 @@ if __name__ == "__main__":
     print(get_data_home())
 
     dataset_name = "FASHION_MOBILENET"
-    other_label_name = "class_subcat"  # None
+    other_label_name = "class_subcat"  # [None, "class_subcat", "class_matcat"]
     _, X, y = load_dataset(dataset_name, pca=0.9)
 
     if other_label_name is not None:

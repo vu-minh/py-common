@@ -1,5 +1,5 @@
-'''Test dataset util functions
-'''
+"""Test dataset util functions
+"""
 
 import unittest
 import numpy as np
@@ -12,23 +12,28 @@ from dataset.dataset import load_dataset
 
 class DatasetTestCase(unittest.TestCase):
     def setUp(self):
-        set_data_home('./data')
+        set_data_home("./data")
         self.list_datasets = [
-            'FONT_A_100',
-            'FASHION100', 'QUICKDRAW200',
-            'IRIS', 'DIGITS', 'WINE', 'BREAST_CANCER',
-            'COIL20', 'COIL20_500'
+            "FONT_A_100",
+            "FASHION100",
+            "QUICKDRAW200",
+            "IRIS",
+            "DIGITS",
+            "WINE",
+            "BREAST_CANCER",
+            "COIL20",
+            "COIL20_500",
         ]
 
     def test_data_home(self):
-        self.assertEqual(get_data_home(), './data')
+        self.assertEqual(get_data_home(), "./data")
 
     def test_list_dir(self):
         self.assertIsInstance(list_datasets(), list)
 
     def test_dataset_name_does_not_exist(self):
         with self.assertRaises(ValueError):
-            load_dataset('NameNotExist')
+            load_dataset("NameNotExist")
 
     def test_load_dataset_return_3_array(self):
         for dataset_name in self.list_datasets:
@@ -38,28 +43,24 @@ class DatasetTestCase(unittest.TestCase):
     def test_dataset_type(self):
         for dataset_name in self.list_datasets:
             data = load_dataset(dataset_name)
-            self.assertListEqual(
-                list(map(lambda X: X.dtype, data)), [np.float32]*3
-            )
+            self.assertListEqual(list(map(lambda X: X.dtype, data)), [np.float32] * 3)
 
     def test_dataset_size(self):
         expected_size = dict(
-            COIL20=[(1440, 32*32), (1440, 32*32), (1440,)],
-            COIL20_500=[(500, 32*32), (500, 32*32), (500,)],
-            FONT_A_100=[(100, 24*24), (100, 24*24), (100,)],
-            FASHION100=[(100, 28*28), (100, 28*28), (100,)],
-            QUICKDRAW200=[(200, 28*28), (200, 28*28), (200,)],
+            COIL20=[(1440, 32 * 32), (1440, 32 * 32), (1440,)],
+            COIL20_500=[(500, 32 * 32), (500, 32 * 32), (500,)],
+            FONT_A_100=[(100, 24 * 24), (100, 24 * 24), (100,)],
+            FASHION100=[(100, 28 * 28), (100, 28 * 28), (100,)],
+            QUICKDRAW200=[(200, 28 * 28), (200, 28 * 28), (200,)],
             IRIS=[(150, 4), (150, 4), (150,)],
-            DIGITS=[(1797, 8*8), (1797, 8*8), (1797,)],
+            DIGITS=[(1797, 8 * 8), (1797, 8 * 8), (1797,)],
             WINE=[(178, 13), (178, 13), (178,)],
-            BREAST_CANCER=[(569, 30), (569, 30), (569,)]
+            BREAST_CANCER=[(569, 30), (569, 30), (569,)],
         )
 
         for dataset_name, dataset_size in expected_size.items():
             data = load_dataset(dataset_name)
-            self.assertListEqual(
-                list(map(lambda X: X.shape, data)), dataset_size
-            )
+            self.assertListEqual(list(map(lambda X: X.shape, data)), dataset_size)
 
 
 # TODO TestCase class to test data preprocessing:
@@ -70,12 +71,12 @@ class DatasetTestCase(unittest.TestCase):
 
 def test_load_multi_label_dataset():
     import joblib
+
     dataset_name = "Automobile_transformed"
     in_name = f"./data/kaggle/{dataset_name}.pkl"
     data = joblib.load(in_name)
     print(data["multi_aspects"].keys())
     print(data.keys())
-
 
 
 if __name__ == "__main__":
